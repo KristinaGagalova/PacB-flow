@@ -1,13 +1,14 @@
 ## Comparison of available primary assemblers from long reads
 
-Benchmarking - Pawsey cluster performance, using the flollowing settings on Slurm:
+Benchmarking - Setonix HPC performance, using the flollowing settings on Slurm:
 
 * ```--exclusive``` - used exclusive node for benchmarking    
-* ```--cpus-per-task=24``    
+* ```--cpus-per-task=24```    
 * ```--nodes=1```    
 * ```--ntasks=1```     
 * ```--partition=work```    
-* ```--mem=100G```     
+* ```--mem=200G``` - maximum memory for work queue    
+
 
 | Assembler        | Wall-clock time | CPU time   | Memory Utilized |
 |------------------|-----------------|------------|-----------------|
