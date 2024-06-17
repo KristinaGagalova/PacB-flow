@@ -38,11 +38,11 @@ Assembly contiguity and stats for test sample:
 | Assembler        | Wall-clock time | CPU time   | Memory Utilized |
 |------------------|-----------------|------------|-----------------|
 | Spades           | 03:45:11        | 2-22:34:13 | 18.24 GB        |
-| Unicycler - lr + sr  |         |  |         |
+| Unicycler - lr + sr  | NA (time-out)        | NA | NA         |
 
 Assembly contiguity and stats for test sample:   
 
 | Assembler        | # of contigs | N50    | min   | max    | Genome size |
 |------------------|--------------|--------|-------|--------|-------------|
 | Spades           | 28688        | 342047 | 500   | 1121776| 38.57e6     |
-| Unicycler - lr + sr |            | |   | |      |
+| Unicycler - lr + sr |    NA        | NA | NA  | NA |  NA    |
