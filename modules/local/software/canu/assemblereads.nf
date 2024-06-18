@@ -5,8 +5,8 @@ process CANU_ASSEMBLY {
 
      conda (params.enable_conda ? "bioconda::canu=2.2" : null)
      container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/canu:canu:2.2--ha47f30e_0 ':
-        'quay.io/biocontainers/canu:2.2--ha47f30e_0' }"
+	'quay.io/biocontainers/canu:2.2--ha47f30e_0':
+        'https://depot.galaxyproject.org/singularity/canu:2.2--ha47f30e_0' }"
 
     input:
         tuple val(sample_id), path(reads)

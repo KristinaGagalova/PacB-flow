@@ -13,7 +13,7 @@ workflow ASSEMBLY_PIPELINE {
 
     main:
         // run primary assembly
-        CANU_ASSEMBLY(assembly, lr)    
+        CANU_ASSEMBLY(assembly_lr)    
   
     emit:
         versions = CANU_ASSEMBLY.out.versions
