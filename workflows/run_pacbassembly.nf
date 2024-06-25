@@ -1,3 +1,7 @@
+//--------------------------------------------------
+// Workflow assembly PB
+//--------------------------------------------------
+
 include { ASSEMBLY_PIPELINE } from '../subworkflows/local/run_pacbassembly/main'
 
 // Parse manifest here

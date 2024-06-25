@@ -25,10 +25,10 @@ process CANU_ASSEMBLY {
         genomeSize=${params.genome_size} \
         -pacbio ${reads}
     
-    cat <<-END_VERSIONS > versions.yml
+    cat <<-VERSIONS > versions.yml
     "${task.process}":
 	canu: \$(canu -version | cut -d' ' -f2)
-    END_VERSIONS
+    VERSIONS
     """
 
 }
