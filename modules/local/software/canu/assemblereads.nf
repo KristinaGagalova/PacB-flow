@@ -1,6 +1,6 @@
 process CANU_ASSEMBLY {
 
-    label 'large_task'
+    label 'large_assemblyTask'
     tag "Assemble long reads for ${sample_id}"
 
      conda (params.enable_conda ? "bioconda::canu=2.2" : null)

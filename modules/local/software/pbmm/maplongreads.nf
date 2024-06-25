@@ -1,6 +1,6 @@
 process PBMM_MAPLONG {
 
-    label 'medium_task'
+    label 'large_task'
     tag "Mapping long reads ${sample_id}"
 
      conda (params.enable_conda ? "bioconda::pbmm=1.14" : null)
