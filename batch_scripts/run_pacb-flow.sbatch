@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
-#SBATCH --mem=12GB #requirements may be high in case user downloads large images
+#SBATCH --mem=24GB #requirements may be high in case user downloads large images
 #SBATCH --partition=work
 #SBATCH --time=1-00:00:00
 #SBATCH --account=y95
