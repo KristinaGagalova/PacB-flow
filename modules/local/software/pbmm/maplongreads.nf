@@ -13,8 +13,9 @@ process PBMM_MAPLONG {
 	tuple val(assembly_id), path(assembly)
     
     output:
-        tuple val(assembly_id), path("${assembly_id}.lr.sort.bam"), emit: mapped_lr
-	path("versions.yml")                                      , emit: versions
+        tuple val(assembly_id), path("${assembly_id}.lr.sort.bam")    , emit: mapped_lr
+	tuple val(assembly_id), path("${assembly_id}.lr.sort.bam.bai"), emit: mapped_lr_index
+	path("versions.yml")                                          , emit: versions
 
     script:
     """
