@@ -35,7 +35,7 @@ Example script
 nextflow run ./main.nf -resume \
         -profile pawsey_setonix,singularity \
         --manifest samples.tsv \
-        --ntjoin_ref '/path/to/refgenome/PacB-flow/GCA_900231935.2_ERZ478497_genomic.fna 
+        --ntjoin_ref '/path/to/refgenome/PacB-flow/GCA_900231935.2_ERZ478497_genomic.fna' \ 
 	--ntjoin_ref_weights '2' \ #string, weight for refernce genome
         --ntjoin_w 500 \ # window size
         --ntjoin_k 24 \ # kmer size
