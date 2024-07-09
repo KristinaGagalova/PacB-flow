@@ -26,9 +26,26 @@ sampleId,lr_reads,sr_read1,sr_read2
 name,/path/to/longreads,/path/to/pair1,/path/to/pair2
 ```
 
+## Scaffolding with reference genome
+The pipeline will use a reference genome if provides and will use it for scaffolding with ntJoin pipeline. If not provided, it will skip this step. Please refer to the parameters for PacB-flow with scaffolding. Refer to the [ntJoin](https://github.com/bcgsc/ntJoin) code for more details.                 
+ntJoin can get multiple genomes as an input; for simplicity, we only use one at the time here.    
+
+Example script
+```
+nextflow run ./main.nf -resume \
+        -profile pawsey_setonix,singularity \
+        --manifest samples.tsv \
+        --ntjoin_ref '/path/to/refgenome/PacB-flow/GCA_900231935.2_ERZ478497_genomic.fna 
+	--ntjoin_ref_weights '2' \ #string, weight for refernce genome
+        --ntjoin_w 500 \ # window size
+        --ntjoin_k 24 \ # kmer size
+        --ntjoin_no_cut 'True' # do not cut input genome
+```
+
 ## Output
 ```
-results/processing/canu/*  #primary assemby and report
-results/processing/abyss/* #assembly stats
-results/processing/pbmm/*  #primary assembly long reads alignment
+results/processing/canu/*    #primary assemby and report
+results/processing/abyss/*   #assembly stats
+results/processing/pbmm/*    #primary assembly long reads alignment
+results/processing/ntjoin/*  #scaffolded genome
 ```

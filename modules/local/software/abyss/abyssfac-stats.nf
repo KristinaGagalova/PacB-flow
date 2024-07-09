@@ -9,15 +9,15 @@ process ABYSS_FAC {
 	'quay.io/biocontainers/abyss:2.3.7--h103dbdd_4'}"
 
     input:
-	tuple val(assembly_id), path(assembly)
+	tuple val(sample_id), path(assembly) //
     
     output:
-        tuple val(assembly_id), path("${assembly_id}.lr_stats"), emit: assembly_stats
-	path("versions.yml")                                   , emit: versions
+        tuple val(sample_id), path("${sample_id}_stats.tsv"), emit: assembly_stats
+	path("versions.yml")                                , emit: versions
 
     script:
     """
-    abyss-fac ${assembly} > ${assembly_id}.lr_stats
+    abyss-fac ${assembly} > ${sample_id}_stats.tsv
 
     cat <<-VERSIONS > versions.yml
     "${task.process}":
