@@ -26,6 +26,10 @@ sampleId,lr_reads,sr_read1,sr_read2
 name,/path/to/longreads,/path/to/pair1,/path/to/pair2
 ```
 
+## Scaffolding with long reads
+
+Follows....
+
 ## Scaffolding with reference genome
 The pipeline will use a reference genome if provides and will use it for scaffolding with ntJoin pipeline. If not provided, it will skip this step. Please refer to the parameters for PacB-flow with scaffolding. Refer to the [ntJoin](https://github.com/bcgsc/ntJoin) code for more details.                 
 ntJoin can get multiple genomes as an input; for simplicity, we only use one at the time here.    
