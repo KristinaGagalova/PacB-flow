@@ -27,8 +27,13 @@ name,/path/to/longreads,/path/to/pair1,/path/to/pair2
 ```
 
 ## Scaffolding with long reads
-
-Follows....
+The pipeline uses the primary assembly and the raw reads to scaffold the genome, with complete pipeline options and ```ntLink_rounds``` + gap filling. The resulting genome, if a reference genome is provided, is passed to ntJoin (see info below). This is an example to run the ntLink step only (by default ntLink is not run):
+```
+nextflow run ./main.nf -resume \
+        -profile pawsey_setonix,singularity \
+        --manifest samples.tsv \
+        --ntlink_run true
+```
 
 ## Scaffolding with reference genome
 The pipeline will use a reference genome if provides and will use it for scaffolding with ntJoin pipeline. If not provided, it will skip this step. Please refer to the parameters for PacB-flow with scaffolding. Refer to the [ntJoin](https://github.com/bcgsc/ntJoin) code for more details.                 
@@ -46,10 +51,24 @@ nextflow run ./main.nf -resume \
         --ntjoin_no_cut 'True' # do not cut input genome
 ```
 
+## Scaffolding with long reads and reference genome
+```
+nextflow run ./main.nf -resume \
+        -profile pawsey_setonix,singularity \
+        --manifest samples.tsv \
+        --ntlink_run true \
+        --ntjoin_ref '/path/to/refgenome//PacB-flow/GCA_900231935.2_ERZ478497_genomic.fna' \
+        --ntjoin_ref_weights '2' \
+        --ntjoin_w 500 \
+        --ntjoin_k 24 \
+        --ntjoin_no_cut 'True'
+```
+
 ## Output
 ```
-results/processing/canu/*    #primary assemby and report
-results/processing/abyss/*   #assembly stats
-results/processing/pbmm/*    #primary assembly long reads alignment
-results/processing/ntjoin/*  #scaffolded genome
+results/processing/canu/*                #primary assemby and report
+results/processing/pbmm/*                #primary assembly long reads alignment
+results/processing/ntlink/*              #scaffolded genome - long reads (optional) 
+results/processing/ntjoin/*              #scaffolded genome - ref (optional) 
+results/processing/abyss/all_stats.tsv   #all samples assembly stats
 ```
