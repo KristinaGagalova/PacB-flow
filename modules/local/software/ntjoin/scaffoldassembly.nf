@@ -13,10 +13,10 @@ process NTJOIN_SCAFFOLD {
 	path(ref_genome)
 
     output:
-        tuple val("${sample_id}.scaf"), path("${sample_id}/${sample_id}.ntjoin.scaffolds.fa"), emit: assembly
-        tuple val("${sample_id}.scaf"), path("${sample_id}/ntjoin.path")                     , emit: scaffold_paths
-	tuple val("${sample_id}.scaf"), path("${sample_id}/ntjoin.agp")                      , emit: scaffold_agp
-        path("versions.yml")                                                                 , emit: versions
+        tuple val("${sample_id}.ntjoin"), path("${sample_id}/${sample_id}.ntjoin.scaffolds.fa"), emit: assembly
+        tuple val("${sample_id}.ntjoin"), path("${sample_id}/ntjoin.path")                     , emit: scaffold_paths
+	tuple val("${sample_id}.ntjoin"), path("${sample_id}/ntjoin.agp")                      , emit: scaffold_agp
+        path("versions.yml")                                                                   , emit: versions
 
     script:
     def args_ref  = params.ntjoin_ref
@@ -28,7 +28,6 @@ process NTJOIN_SCAFFOLD {
     def args_cut  = ntjoin_no_cut.capitalize()
     
     """
-    echo ${args_cut}
     ntJoin assemble target=${assembly} \
 	references=${args_ref} \
 	reference_weights=${args_refW} \
@@ -44,13 +43,13 @@ process NTJOIN_SCAFFOLD {
     mv ${assembly}.k${args_k}.w${args_w}.n1.all.scaffolds.fa ${sample_id}/${sample_id}.ntjoin.scaffolds.fa
     mv ntjoin* ${sample_id}/
 
-    #cleanup ref genome files
-    rm ${args_ref}.k${args_k}.w${args_w}.tsv
-    rm ${args_ref}.fai
+    #cleanup ref genome files - these must be left for other samples
+    #rm ${args_ref}.k${args_k}.w${args_w}.tsv
+    #rm ${args_ref}.fai
 
     cat <<-VERSIONS > versions.yml
     "${task.process}":
-        ntJoin: \$(ntJoin help | grep "^ntJoin" | grep -v ":" | head -n1)
+        ntJoin: \$(ntJoin help | grep "^ntJoin" | grep -v ":" | cut -d" " -f2 | head -n1)
     VERSIONS
     """
 }
