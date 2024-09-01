@@ -1,26 +1,26 @@
 # PacB-flow
-PacBio long reads assebly workflow based on Nextflow.    
+PacBio long reads assembly workflow based on Nextflow.    
 
 
-Summary of the workflow is shown below
+A summary of the workflow is shown below
 ![nf-pipeline](img/Nf-pacbflow.png)
 
 ## Nexflow pipeline
-Nexflow version has to be >22.10.7, please install it following the instructions [here](https://www.nextflow.io/docs/latest/install.html).
+The Nexflow version must be >22.10.7. Please install it following the instructions [here](https://www.nextflow.io/docs/latest/install.html).
 
 ## How to run the pipeline
-The assembly requires significant memory usage, thus the use of an HPC is recommended. Local machines are not able to handle the high memory peak.    
+The assembly requires significant memory usage, so it is recommended that an HPC be used. Local machines are not able to handle the high memory peak.    
 
-The pipeline uses the state-of-the-art assembly algorithms, optimized for fungal pathogens with an expected genome size of 40MB. The pipeline runs the following:     
-* CANU primary assembly - this first stage assembly trims, corrects and assembles the raw input reads. It is important to know that the algorithm is not deterministic and slight changes are expected between runs. Please reads the documentation [here](https://github.com/AustralianBioCommons/Canu/blob/master/Canu.md#how-does-the-biocommons-optimised-canu-compare-with-canu) for more details. For further optimization on other HPC systems, please consider the BioCommons benchmarking, as described [here](https://github.com/AustralianBioCommons/Canu/blob/master/NCI_optimisation.md).    
+The pipeline uses state-of-the-art assembly algorithms optimized for fungal pathogens with an expected genome size of 40MB. The pipeline runs the following:     
+* CANU primary assembly - this first stage of assembly trims, corrects and assembles the raw input reads. It is important to know that the algorithm is not deterministic, and slight changes are expected between runs. Please read the documentation [here](https://github.com/AustralianBioCommons/Canu/blob/master/Canu.md#how-does-the-biocommons-optimised-canu-compare-with-canu) for more details. For further optimization on other HPC systems, please consider the BioCommons benchmarking, as described [here](https://github.com/AustralianBioCommons/Canu/blob/master/NCI_optimisation.md).    
 * The default run stops at the primary assembly. With the option ```ntlink_run=true```, the pipeline runs the long read scaffolding stage performed by ntLink.    
-* By adding the path to a reference genome with ```ntjoin_ref=/path/to/my/genome```, the pipeline runs a reference scaffolding stage with ntJoin, after the long reads scaffolding.     
-* It is important to note that long reads scaffolding is the first stage of scaffolding, followied by reference scaffolding.    
-* The following parameters, allow the execution of different flavours of teh assembly pipeline:       
+* By adding the path to a reference genome with ```ntjoin_ref=/path/to/my/genome```, the pipeline runs a reference scaffolding stage with ntJoin after the long reads scaffolding.     
+* I would like to point out that long reading scaffolding is the first stage, followed by reference scaffolding.    
+* The following parameters allow the execution of different flavours of the assembly pipeline:       
 	1. Default parameters - primary assembly only          
-	2. ```ntlink_run=true``` - primary assembly and long reads scaffodling      
-	3. ```ntjoin_ref=/path/to/my/genome``` - primary assembly and reference scaffolding     
-	4. ```ntlink_run=true``` and ```ntjoin_ref=/path/to/my/genome``` - primary assembly, long reads and reference scaffoding       
+	2. Scaffolding with long reads: ```ntlink_run true``` - primary assembly + long reads scaffolding      
+	3. Scaffolding with reference genome: ```ntjoin_ref /path/to/my/genome``` - primary assembly + reference scaffolding     
+	4. Complete pipeline: ```ntlink_run true``` and ```ntjoin_ref /path/to/my/genome``` - primary assembly + long reads + reference scaffolding       
 
 ## Manifest file format
 The manifest contains the pairing of short and long reads to be used for the assembly. An example of the manifest can be found in ```testrun_manifest/samples.csv```.    
@@ -28,6 +28,7 @@ The manifest contains the pairing of short and long reads to be used for the ass
 sampleId,lr_reads,sr_read1,sr_read2
 name,/path/to/longreads,/path/to/pair1,/path/to/pair2
 ```
+## Running the pipeline
 ## 1. Default parameters
 Pawsey - Setonix run setup
 ```
@@ -38,7 +39,7 @@ nextflow run ./main.nf \
 ```
 
 ## 2. Scaffolding with long reads
-The pipeline uses the primary assembly and the raw reads to scaffold the genome, with complete pipeline options and ```ntLink_rounds``` + gap filling. The resulting genome, if a reference genome is provided, is passed to ntJoin (see info below). This is an example to run the ntLink step only (by default ntLink is not run):
+The pipeline uses the primary assembly and the raw reads to scaffold the genome, with complete pipeline options and ```ntLink_rounds``` + gap filling. If a reference genome is provided, the resulting genome is passed to ntJoin (see info below). This is an example to run the ntLink step only (by default ntLink is not run):
 ```
 nextflow run ./main.nf -resume \
         -profile pawsey_setonix,singularity \
@@ -47,8 +48,8 @@ nextflow run ./main.nf -resume \
 ```
 
 ## 3. Scaffolding with reference genome
-The pipeline will use a reference genome if provides and will use it for scaffolding with ntJoin pipeline. If not provided, it will skip this step. Please refer to the parameters for PacB-flow with scaffolding. Refer to the [ntJoin](https://github.com/bcgsc/ntJoin) code for more details.                 
-ntJoin can get multiple genomes as an input; for simplicity, we only use one at the time here.    
+If provided, the pipeline will use a reference genome for scaffolding with the ntJoin pipeline. If not provided, it will skip this step. Please refer to the parameters for PacB-flow with scaffolding. For more details, refer to the [ntJoin](https://github.com/bcgsc/ntJoin) code.                 
+ntJoin can get multiple genomes as input; we use only one at a time here for simplicity.    
 
 Example script
 ```
