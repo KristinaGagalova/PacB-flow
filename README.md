@@ -13,8 +13,8 @@ The assembly requires significant memory usage, so it is recommended that an HPC
 
 The pipeline uses state-of-the-art assembly algorithms optimized for fungal pathogens with an expected genome size of 40MB. The pipeline runs the following:     
 * CANU primary assembly - this first stage of assembly trims, corrects and assembles the raw input reads. It is important to know that the algorithm is not deterministic, and slight changes are expected between runs. Please read the documentation [here](https://github.com/AustralianBioCommons/Canu/blob/master/Canu.md#how-does-the-biocommons-optimised-canu-compare-with-canu) for more details. For further optimization on other HPC systems, please consider the BioCommons benchmarking, as described [here](https://github.com/AustralianBioCommons/Canu/blob/master/NCI_optimisation.md).    
-* The default run stops at the primary assembly. With the option ```ntlink_run=true```, the pipeline runs the long read scaffolding stage performed by ntLink.    
-* By adding the path to a reference genome with ```ntjoin_ref=/path/to/my/genome```, the pipeline runs a reference scaffolding stage with ntJoin after the long reads scaffolding.     
+* The default run stops at the primary assembly. With the option ```ntlink_run true```, the pipeline runs the long read scaffolding stage performed by ntLink.    
+* By adding the path to a reference genome with ```ntjoin_ref /path/to/my/genome```, the pipeline runs a reference scaffolding stage with ntJoin after the long reads scaffolding.     
 * I would like to point out that long reading scaffolding is the first stage, followed by reference scaffolding.    
 * The following parameters allow the execution of different flavours of the assembly pipeline:       
 	1. Default parameters - primary assembly only          
