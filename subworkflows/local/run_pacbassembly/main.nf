@@ -17,77 +17,84 @@ workflow ASSEMBLY_PIPELINE {
 
     take:
         assembly_lr // tuple [sample, lr_reads ]
-        assembly_sr // tuple [sample, sr1_reads, sr2_reads]    
+        assembly_sr // tuple [sample, sr1_reads, sr2_reads]
 
     main:
-	//
-	allAssembliesChannel = Channel.empty()
+        //
+        allAssembliesChannel = Channel.empty()
 
-	// run primary assembly
+        // run primary assembly
         CANU_ASSEMBLY_OUT = CANU_ASSEMBLY(assembly_lr)
-	assembly_lr.join(CANU_ASSEMBLY_OUT.assembly)
-                        .set { ch_readslr_assembly }
-
+        assembly_lr.join(CANU_ASSEMBLY_OUT.assembly)
+                   .set { ch_readslr_assembly }
         COV_PRIMARY(ch_readslr_assembly)
         ASSEMBLY = CANU_ASSEMBLY_OUT
-	ASSEMBLY.assembly
+        ASSEMBLY.assembly
                 .map { it -> it[1] }
                 .mix(allAssembliesChannel)
                 .collect()
                 .set { all_assemblies}
-	
-        // run scaffolding with long reads
-	def nam_suffix = ''
-	if (params.ntlink_run) {
-	    // ntLink scaffolding
-            ASSEMBLY = NTLINK_SCAFFOLD(
-	    		ASSEMBLY.assembly,
-	    		assembly_lr
-			)
-	    // rename input lr
-	    nam_suffix = "${nam_suffix}.ntlink"
-	    assembly_lr
-    		.map { val, path -> tuple("${val}${nam_suffix}", path) }
-		.set { assembly_lr_scaf }
-            assembly_lr_scaf.join(ASSEMBLY.assembly)
-                	.set { ch_readslr_assembly_scaf }
-	    
-	    COV_SCAF(ch_readslr_assembly_scaf)
-	    ASSEMBLY.assembly
-                	.map { it -> it[1] }
-                	.mix(all_assemblies)
-                	.collect()
-                	.set { all_assemblies }
-	
-	}
-	
-	if (params.ntjoin_ref) {
-	    // ntJoin scaffolding
-            Channel.fromPath( params.ntjoin_ref, checkIfExists: true )
-                                .set { ntJoin_input_ref }
-            ASSEMBLY = NTJOIN_SCAFFOLD(ASSEMBLY.assembly, ntJoin_input_ref)
-	    nam_suffix = "${nam_suffix}.ntjoin"
-            assembly_lr
-                .map { val, path -> tuple("${val}${nam_suffix}", path) }
-                .set { assembly_lr_scafref }
-	    assembly_lr_scafref.join(ASSEMBLY.assembly)
-                        .set { ch_readslr_assembly_scaf_ref }
-	    COV_SCAFREF(ch_readslr_assembly_scaf_ref)
 
-	    ASSEMBLY.assembly
+        // Default suffix
+        nam_suffix = ''
+
+        // Long read scaffolding (ntLink)
+        if (params.ntlink_run) {
+            ASSEMBLY = NTLINK_SCAFFOLD(ASSEMBLY.assembly, assembly_lr)
+            nam_suffix = ".ntlink"
+
+            assembly_lr_scaf_channel = true // Flag to indicate ntLink ran
+        }
+
+        // NTJoin scaffolding (either after ntLink or standalone if only ntjoin_ref is provided)
+        if (params.ntjoin_ref) {
+
+            if (file(params.ntjoin_ref).exists()) {
+                ntJoin_input_ref = file(params.ntjoin_ref)
+            } else {
+                throw new FileNotFoundException("File ${params.ntjoin_ref} does not exist.")
+            }
+
+            nam_suffix = assembly_lr_scaf_channel ? ".ntlink.ntjoin" : ".ntjoin"
+            ASSEMBLY = NTJOIN_SCAFFOLD(ASSEMBLY.assembly, ntJoin_input_ref)
+        }
+
+        // ** After the `if` blocks, do the necessary mapping based on final suffix **
+        
+        // For ntLink
+        assembly_lr.map { val, path -> tuple("${val}${nam_suffix}", path) }
+                   .set { assembly_lr_scaf }
+        assembly_lr_scaf.join(ASSEMBLY.assembly)
+                        .set { ch_readslr_assembly_scaf }
+
+        // View to check output during this step
+        assembly_lr_scaf.view()
+
+        def cov_scaf_output = COV_SCAF(ch_readslr_assembly_scaf)
+
+        // For NTJoin
+        assembly_lr.map { val, path -> tuple("${val}${nam_suffix}", path) }
+                   .set { assembly_lr_scafref }
+        assembly_lr_scafref.join(ASSEMBLY.assembly)
+                           .set { ch_readslr_assembly_scaf_ref }
+
+        def cov_scafref_output = COV_SCAFREF(ch_readslr_assembly_scaf_ref)
+
+        // Map assembly outputs
+        ASSEMBLY.assembly
                 .map { it -> it[1] }
                 .mix(all_assemblies)
                 .collect()
                 .set { all_assemblies }
-	}
-	
-	// run stats on final output   
-	ABYSS_FAC(all_assemblies)
+
+        // Run stats on final output
+        ABYSS_FAC(all_assemblies)
 
     emit:
-        versions    = CANU_ASSEMBLY.out.versions
-        //lr_stats    = ABYSS_FAC.out.assembly_stats
-	scaffolded  = ASSEMBLY.assembly
-	
-
+        versions = CANU_ASSEMBLY.out.versions
+        scaffolded = ASSEMBLY.assembly
+        // Uncomment the following if emitting these values
+        // cov_scaf_output = cov_scaf_output
+        // cov_scafref_output = cov_scafref_output
 }
+

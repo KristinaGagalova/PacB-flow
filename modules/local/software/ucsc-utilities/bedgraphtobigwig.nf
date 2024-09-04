@@ -7,8 +7,8 @@ process UCSC_BEDGRAPHCONVERT {
      container 'https://depot.galaxyproject.org/singularity/ucsc-bedgraphtobigwig:455--h2a80c09_1' 
 
     input:
-        tuple val(sample_id), path(bedgraph)
-	tuple val(sample_id), path(fasta_lens)
+        tuple val(sample_id), path(bedgraph), path(fasta_lens)
+	//tuple val(sample_id), path(fasta_lens)
 
     output:
         tuple val("${sample_id}"), path("${sample_id}.bw"), emit: bigwig
