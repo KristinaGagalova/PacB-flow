@@ -13,6 +13,7 @@ include { COVERAGE_CALCULATE as COV_PRIMARY }       from '../../../subworkflows/
 include { COVERAGE_CALCULATE as COV_SCAF }          from '../../../subworkflows/local/calculate_coverage/main'
 include { COVERAGE_CALCULATE as COV_SCAFREF }       from '../../../subworkflows/local/calculate_coverage/main'
 
+
 workflow ASSEMBLY_PIPELINE {
 
     take:
@@ -23,7 +24,7 @@ workflow ASSEMBLY_PIPELINE {
         //
         allAssembliesChannel = Channel.empty()
 
-        // run primary assembly
+        // Run primary assembly
         CANU_ASSEMBLY_OUT = CANU_ASSEMBLY(assembly_lr)
         assembly_lr.join(CANU_ASSEMBLY_OUT.assembly)
                    .set { ch_readslr_assembly }
@@ -33,59 +34,77 @@ workflow ASSEMBLY_PIPELINE {
                 .map { it -> it[1] }
                 .mix(allAssembliesChannel)
                 .collect()
-                .set { all_assemblies}
+                .set { all_assemblies }
 
         // Default suffix
         nam_suffix = ''
 
-        // Long read scaffolding (ntLink)
+        // Long read scaffolding (ntLink) if ntlink_run is True
         if (params.ntlink_run) {
+
             ASSEMBLY = NTLINK_SCAFFOLD(ASSEMBLY.assembly, assembly_lr)
             nam_suffix = ".ntlink"
 
-            assembly_lr_scaf_channel = true // Flag to indicate ntLink ran
+            // Update `assembly_lr_scaf` with suffix after ntLink
+            assembly_lr.map { val, path -> tuple("${val}${nam_suffix}", path) }
+                       .set { assembly_lr_scaf }
+            // Join ntLink assembly and run COV_SCAF
+            assembly_lr_scaf.join(ASSEMBLY.assembly)
+                            .set { ch_readslr_assembly_scaf }
+            // Run COV_SCAF at ntLink stage
+            def cov_scaf_output = COV_SCAF(ch_readslr_assembly_scaf)
+
+            // Ensure the assembly after ntLink is mixed into all assemblies
+            ASSEMBLY.assembly
+                    .map { it -> it[1] }
+                    .mix(all_assemblies)
+                    .collect()
+                    .set { all_assemblies }
         }
 
-        // NTJoin scaffolding (either after ntLink or standalone if only ntjoin_ref is provided)
-        if (params.ntjoin_ref) {
+        // NTJoin scaffolding (if ntjoin_ref is provided)
+	// Run NTJoin scaffolding AFTER ntLink and COV_SCAF if both are used
+	if (params.ntlink_run && params.ntjoin_ref) {
 
-            if (file(params.ntjoin_ref).exists()) {
-                ntJoin_input_ref = file(params.ntjoin_ref)
-            } else {
-                throw new FileNotFoundException("File ${params.ntjoin_ref} does not exist.")
-            }
+		if (file(params.ntjoin_ref).exists()) {
+                	ntJoin_input_ref = file(params.ntjoin_ref)
+            	} else {
+                	throw new FileNotFoundException("File ${params.ntjoin_ref} does not exist.")
+            	}
 
-            nam_suffix = assembly_lr_scaf_channel ? ".ntlink.ntjoin" : ".ntjoin"
-            ASSEMBLY = NTJOIN_SCAFFOLD(ASSEMBLY.assembly, ntJoin_input_ref)
-        }
+    		// Wait for ntLink and COV_SCAF to finish before running NTJoin
+    		ch_readslr_assembly_scaf
+        		.set { delayed_assembly_lr_scaf }
+    		// Now run NTJOIN_SCAFFOLD on the delayed channel
+    		ASSEMBLY = NTJOIN_SCAFFOLD(ASSEMBLY.assembly, ntJoin_input_ref)
 
-        // ** After the `if` blocks, do the necessary mapping based on final suffix **
-        
-        // For ntLink
-        assembly_lr.map { val, path -> tuple("${val}${nam_suffix}", path) }
-                   .set { assembly_lr_scaf }
-        assembly_lr_scaf.join(ASSEMBLY.assembly)
-                        .set { ch_readslr_assembly_scaf }
+    		// Update `assembly_lr_scafref` with suffix after NTJoin
+    		delayed_assembly_lr_scaf.map { val, reads, fasta -> tuple("${val}.ntlink.ntjoin", reads) }
+                	            .set { assembly_lr_scafref }
 
-        // View to check output during this step
-        assembly_lr_scaf.view()
+    		// Join NTJoin assembly and run COV_SCAFREF
+    		assembly_lr_scafref.join(ASSEMBLY.assembly)
+                	       .set { ch_readslr_assembly_scaf_ref }
 
-        def cov_scaf_output = COV_SCAF(ch_readslr_assembly_scaf)
+    		// Run COV_SCAFREF at NTJoin stage
+    		def cov_scafref_output = COV_SCAFREF(ch_readslr_assembly_scaf_ref)
 
-        // For NTJoin
-        assembly_lr.map { val, path -> tuple("${val}${nam_suffix}", path) }
-                   .set { assembly_lr_scafref }
-        assembly_lr_scafref.join(ASSEMBLY.assembly)
-                           .set { ch_readslr_assembly_scaf_ref }
+	} else if (params.ntjoin_ref) {
+    		// If only ntJoin_ref is provided, run NTJOIN directly
+    		ASSEMBLY = NTJOIN_SCAFFOLD(ASSEMBLY.assembly, ntJoin_input_ref)
 
-        def cov_scafref_output = COV_SCAFREF(ch_readslr_assembly_scaf_ref)
+    		// Update `assembly_lr_scafref` with suffix after NTJoin
+    		assembly_lr.map { val, path -> tuple("${val}.ntjoin", path) }
+               		.set { assembly_lr_scafref }
 
-        // Map assembly outputs
-        ASSEMBLY.assembly
-                .map { it -> it[1] }
-                .mix(all_assemblies)
-                .collect()
-                .set { all_assemblies }
+    		// Join NTJoin assembly and run COV_SCAFREF
+		assembly_lr_scafref.join(ASSEMBLY.assembly)
+                	.set { ch_readslr_assembly_scaf_ref }
+
+    		// Run COV_SCAFREF at NTJoin stage
+    		def cov_scafref_output = COV_SCAFREF(ch_readslr_assembly_scaf_ref)
+	}
+
 
         // Run stats on final output
         ABYSS_FAC(all_assemblies)
@@ -97,4 +116,3 @@ workflow ASSEMBLY_PIPELINE {
         // cov_scaf_output = cov_scaf_output
         // cov_scafref_output = cov_scafref_output
 }
-
