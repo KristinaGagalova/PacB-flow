@@ -64,13 +64,15 @@ workflow ASSEMBLY_PIPELINE {
 
         // NTJoin scaffolding (if ntjoin_ref is provided)
 	// Run NTJoin scaffolding AFTER ntLink and COV_SCAF if both are used
-	if (params.ntlink_run && params.ntjoin_ref) {
-
+	if (params.ntjoin_ref) {
 		if (file(params.ntjoin_ref).exists()) {
-                	ntJoin_input_ref = file(params.ntjoin_ref)
-            	} else {
-                	throw new FileNotFoundException("File ${params.ntjoin_ref} does not exist.")
-            	}
+                	        ntJoin_input_ref = file(params.ntjoin_ref)
+                	} else {
+                        	throw new FileNotFoundException("File ${params.ntjoin_ref} does not exist.")
+                	}
+	}
+
+	if (params.ntlink_run && params.ntjoin_ref) {
 
     		// Wait for ntLink and COV_SCAF to finish before running NTJoin
     		ch_readslr_assembly_scaf
@@ -104,7 +106,13 @@ workflow ASSEMBLY_PIPELINE {
     		// Run COV_SCAFREF at NTJoin stage
     		def cov_scafref_output = COV_SCAFREF(ch_readslr_assembly_scaf_ref)
 	}
-
+	
+	// Ensure the assembly after ntJoin is mixed into all assemblies
+        ASSEMBLY.assembly
+                .map { it -> it[1] }
+                .mix(all_assemblies)
+                .collect()
+                .set { all_assemblies }
 
         // Run stats on final output
         ABYSS_FAC(all_assemblies)
