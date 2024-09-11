@@ -81,7 +81,7 @@ workflow ASSEMBLY_PIPELINE {
     		ASSEMBLY = NTJOIN_SCAFFOLD(ASSEMBLY.assembly, ntJoin_input_ref)
 
     		// Update `assembly_lr_scafref` with suffix after NTJoin
-    		delayed_assembly_lr_scaf.map { val, reads, fasta -> tuple("${val}.ntlink.ntjoin", reads) }
+    		delayed_assembly_lr_scaf.map { val, reads, fasta -> tuple("${val}.ntjoin", reads) }
                 	            .set { assembly_lr_scafref }
 
     		// Join NTJoin assembly and run COV_SCAFREF
@@ -101,10 +101,10 @@ workflow ASSEMBLY_PIPELINE {
 
     		// Join NTJoin assembly and run COV_SCAFREF
 		assembly_lr_scafref.join(ASSEMBLY.assembly)
-                	.set { ch_readslr_assembly_scaf_ref }
+                	.set { ch_readslr_assembly_scaf_refOnly	}
 
     		// Run COV_SCAFREF at NTJoin stage
-    		def cov_scafref_output = COV_SCAFREF(ch_readslr_assembly_scaf_ref)
+    		def cov_scafref_output = COV_SCAFREF(ch_readslr_assembly_scaf_refOnly)
 	}
 	
 	// Ensure the assembly after ntJoin is mixed into all assemblies

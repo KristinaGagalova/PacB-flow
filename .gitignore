@@ -21,6 +21,7 @@ nextflow.eml
 nextflow.iml
 Vagrantfile
 resources/*
+results/*
 test/*
 tools/*
 tests_other
@@ -39,3 +40,5 @@ temp
 plugins-prod
 sandbox
 wave-tests
+work/*
+slurm*
