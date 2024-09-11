@@ -60,6 +60,7 @@ workflow ASSEMBLY_PIPELINE {
                     .mix(all_assemblies)
                     .collect()
                     .set { all_assemblies }
+
         }
 
         // NTJoin scaffolding (if ntjoin_ref is provided)
@@ -91,6 +92,13 @@ workflow ASSEMBLY_PIPELINE {
     		// Run COV_SCAFREF at NTJoin stage
     		def cov_scafref_output = COV_SCAFREF(ch_readslr_assembly_scaf_ref)
 
+		// Ensure the assembly after ntJoin is mixed into all assemblies
+            	ASSEMBLY.assembly
+                    .map { it -> it[1] }
+                    .mix(allAssembliesChannel)
+                    .collect()
+                    .set { all_assemblies }
+
 	} else if (params.ntjoin_ref) {
     		// If only ntJoin_ref is provided, run NTJOIN directly
     		ASSEMBLY = NTJOIN_SCAFFOLD(ASSEMBLY.assembly, ntJoin_input_ref)
@@ -105,15 +113,15 @@ workflow ASSEMBLY_PIPELINE {
 
     		// Run COV_SCAFREF at NTJoin stage
     		def cov_scafref_output = COV_SCAFREF(ch_readslr_assembly_scaf_refOnly)
+		
+		// Ensure the assembly after ntJoin is mixed into all assemblies
+            	ASSEMBLY.assembly
+                    .map { it -> it[1] }
+                    .mix(allAssembliesChannel)
+                    .collect()
+                    .set { all_assemblies }
 	}
 	
-	// Ensure the assembly after ntJoin is mixed into all assemblies
-        ASSEMBLY.assembly
-                .map { it -> it[1] }
-                .mix(all_assemblies)
-                .collect()
-                .set { all_assemblies }
-
         // Run stats on final output
         ABYSS_FAC(all_assemblies)
 
