@@ -9,8 +9,8 @@ process NTLINK_SCAFFOLD {
        'quay.io/biocontainers/ntlink:1.3.10--py312hb36dd0b_2'}"
 
     input:
-        tuple val(sample_id), path(assembly)
-	tuple val(sample_id), path(reads)
+        tuple val(sample_id), path(reads), path(assembly)
+	//tuple val(sample_id), path(reads)
 
     output:
         tuple val("${sample_id}.ntlink"), path("${sample_id}/${sample_id}.ntlink.scaffolds.fa") , emit: assembly

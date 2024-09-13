@@ -42,9 +42,14 @@ workflow ASSEMBLY_PIPELINE {
         // Long read scaffolding (ntLink) if ntlink_run is True
         if (params.ntlink_run) {
 
-            ASSEMBLY = NTLINK_SCAFFOLD(ASSEMBLY.assembly, assembly_lr)
-            nam_suffix = ".ntlink"
+	    // ensure samples matching
+	    assembly_lr.join(ASSEMBLY.assembly)
+			.set { ch_assembly_lr_primary_assembly }
 
+	    // scaffold with long reads
+            ASSEMBLY = NTLINK_SCAFFOLD(ch_assembly_lr_primary_assembly)
+
+            nam_suffix = ".ntlink"
             // Update `assembly_lr_scaf` with suffix after ntLink
             assembly_lr.map { val, path -> tuple("${val}${nam_suffix}", path) }
                        .set { assembly_lr_scaf }
