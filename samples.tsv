@@ -1,5 +1,5 @@
 sampleId,lr_reads,sr_read1,sr_read2
-19Ptm93_run1,/scratch/y95/ikuznetsova/00_ProjectB33_PaoTheenS/00_RAWin/00_RAW/BAM_to_FASTQ/1_bam2fastq/out_Ptm93.fastq.gz,/path/to/pair1,/path/to/pair2
-19Ptm93_run2,/scratch/y95/ikuznetsova/00_ProjectB33_PaoTheenS/00_RAWin/00_RAW/BAM_to_FASTQ/1_bam2fastq/out_Ptm93.fastq.gz,/path/to/pair1,/path/to/pair2
-Mur3_run1,/scratch/y95/ikuznetsova/00_ProjectB33_PaoTheenS/00_RAWin/00_RAW/BAM_to_FASTQ/1_bam2fastq/out_Mur3.fastq.gz,/path/to/pair1,/path/to/pair2
-Mur3_run2,/scratch/y95/ikuznetsova/00_ProjectB33_PaoTheenS/00_RAWin/00_RAW/BAM_to_FASTQ/1_bam2fastq/out_Mur3.fastq.gz,/path/to/pair1,/path/to/pair2
+19Ptm93_run1,/scratch/y95/ikuznetsova/00_ProjectB33_PaoTheenS/00_RAWin/00_RAW/BAM_to_FASTQ/1_bam2fastq/out_Ptm93.fastq.gz,/scratch/y95/kgagalova/projectPaoTheen/reads/short_reads/FDSW23H000668-concat-1r-2r_L2_1.fq.gz,/scratch/y95/kgagalova/projectPaoTheen/reads/short_reads/FDSW23H000668-concat-1r-2r_L2_2.fq.gz
+19Ptm93_run2,/scratch/y95/ikuznetsova/00_ProjectB33_PaoTheenS/00_RAWin/00_RAW/BAM_to_FASTQ/1_bam2fastq/out_Ptm93.fastq.gz,/scratch/y95/kgagalova/projectPaoTheen/reads/short_reads/FDSW23H000668-concat-1r-2r_L2_1.fq.gz,/scratch/y95/kgagalova/projectPaoTheen/reads/short_reads/FDSW23H000668-concat-1r-2r_L2_2.fq.gz
+Mur3_run1,/scratch/y95/ikuznetsova/00_ProjectB33_PaoTheenS/00_RAWin/00_RAW/BAM_to_FASTQ/1_bam2fastq/out_Mur3.fastq.gz,/scratch/y95/kgagalova/projectPaoTheen/reads/short_reads/FDSW230246616-1r_L2_2.fq.gz,/scratch/y95/kgagalova/projectPaoTheen/reads/short_reads/FDSW230246616-1r_L2_2.fq.gz
+Mur3_run2,/scratch/y95/ikuznetsova/00_ProjectB33_PaoTheenS/00_RAWin/00_RAW/BAM_to_FASTQ/1_bam2fastq/out_Mur3.fastq.gz,/scratch/y95/kgagalova/projectPaoTheen/reads/short_reads/FDSW230246616-1r_L2_1.fq.gz,/scratch/y95/kgagalova/projectPaoTheen/reads/short_reads/FDSW230246616-1r_L2_2.fq.gz

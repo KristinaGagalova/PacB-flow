@@ -3,15 +3,13 @@
 //
 
 include { CANU_ASSEMBLY }                           from '../../../modules/local/software/canu/assemblereads'
-//include { PBMM_MAPLONG as PBMM_MAPPRIMARY }         from '../../../modules/local/software/pbmm/maplongreads'
-//include { PBMM_MAPLONG as PBMM_MAPSCAFFOLDREF }     from '../../../modules/local/software/pbmm/maplongreads'
-//include { PBMM_MAPLONG as PBMM_MAPSCAFFOLDREADS }   from '../../../modules/local/software/pbmm/maplongreads'
 include { ABYSS_FAC }                               from '../../../modules/local/software/abyss/abyssfac-stats'
 include { NTJOIN_SCAFFOLD }                         from '../../../modules/local/software/ntjoin/scaffoldassembly'
 include { NTLINK_SCAFFOLD }                         from '../../../modules/local/software/ntlink/scaffoldassembly'
 include { COVERAGE_CALCULATE as COV_PRIMARY }       from '../../../subworkflows/local/calculate_coverage/main'
 include { COVERAGE_CALCULATE as COV_SCAF }          from '../../../subworkflows/local/calculate_coverage/main'
 include { COVERAGE_CALCULATE as COV_SCAFREF }       from '../../../subworkflows/local/calculate_coverage/main'
+include { POLISH_GENOME }                           from '../../../subworkflows/local/run_polypolish/main'
 
 
 workflow ASSEMBLY_PIPELINE {
@@ -124,6 +122,9 @@ workflow ASSEMBLY_PIPELINE {
 	
         // Run stats on final output
         ABYSS_FAC(all_assemblies)
+	
+	// Polish genome with short reads	
+	POLISH_GENOME(assembly_sr, ASSEMBLY.assembly)
 
     emit:
         versions = CANU_ASSEMBLY.out.versions
