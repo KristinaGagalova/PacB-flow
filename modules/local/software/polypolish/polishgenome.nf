@@ -9,13 +9,12 @@ process POLYPOLISHFILT {
         'quay.io/biocontainers/polypolish:0.6.0--h4c94732_1'}"
 
     input:
-        tuple val(sample_id), path(reads_mapped1)
-	tuple val(sample_id), path(reads_mapped2)
+        tuple val(sample_id), path(reads_mapped1), path(reads_mapped2)
+	//tuple val(sample_id), path(genome)
 
     output:
-        tuple path( sample_id ), path("${sample_id}_filt1.sam"), emit: reads_filt1
-	tuple path( sample_id ), path("${sample_id}_filt2.sam"), emit: reads_filt2
-        path("versions.yml")                                   , emit: versions
+        tuple val( sample_id ), path("${sample_id}_filt1.sam"), path("${sample_id}_filt2.sam"), emit: reads_filt
+        path("versions.yml")                                                                  , emit: versions
 
     script:
     """
@@ -27,7 +26,7 @@ process POLYPOLISHFILT {
 
     cat <<-VERSIONS > versions.yml
     "${task.process}":
-        polypolysh: \$(bwa 2>&1 | grep \"Version\" | awk '{print \$2}')
+        polypolysh: \$(polypolish -V | cut -d" " -f2)
     VERSIONS
     """
 }
@@ -43,8 +42,7 @@ process POLYPOLISHPOLISH {
        'quay.io/biocontainers/polypolish:0.6.0--h4c94732_1'}"
 
     input:
-        tuple val(sample_id), path(reads_filt1)
-        tuple val(sample_id), path(reads_filt2)
+        tuple val(sample_id), path(reads_filt1), path(reads_filt2)
 	tuple val(sample_id), path(genome)
 
     output:
@@ -60,7 +58,7 @@ process POLYPOLISHPOLISH {
 
     cat <<-VERSIONS > versions.yml
     "${task.process}":
-        polypolysh: \$(bwa 2>&1 | grep \"Version\" | awk '{print \$2}')
+        polypolysh: \$(polypolish -V | cut -d" " -f2)
     VERSIONS
     """
 

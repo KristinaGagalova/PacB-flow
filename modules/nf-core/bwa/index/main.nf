@@ -11,8 +11,8 @@ process BWA_INDEX {
     tuple val(meta), path(fasta)
 
     output:
-    tuple val(meta), path(bwa) , emit: index
-    path "versions.yml"        , emit: versions
+    tuple val(meta), path("bwa_${meta}") , emit: index
+    path "versions.yml"                  , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -21,11 +21,11 @@ process BWA_INDEX {
     def prefix = task.ext.prefix ?: "${fasta.baseName}"
     def args   = task.ext.args ?: ''
     """
-    mkdir bwa
+    mkdir bwa_${meta}
     bwa \\
         index \\
         $args \\
-        -p bwa/${prefix} \\
+        -p bwa_${meta}/${prefix} \\
         $fasta
 
     cat <<-END_VERSIONS > versions.yml

@@ -15,7 +15,7 @@ process BWAMEM_MAPALL {
 
     output:
     tuple val("${sample_id}"), path("${sample_id}_${read_pair}.sam"), emit: reads_mapped
-    path("versions.yml")                                             , emit: versions
+    path("versions.yml")                                            , emit: versions
 
 	
     script:

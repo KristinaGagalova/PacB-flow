@@ -128,8 +128,27 @@ workflow ASSEMBLY_PIPELINE {
         // Run stats on final output
         ABYSS_FAC(all_assemblies)
 	
-	// Polish genome with short reads	
-	POLISH_GENOME(assembly_sr, ASSEMBLY.assembly)
+	assembly_sr.map { val, reads1, reads2 ->
+    		if (params.ntlink_run && params.ntjoin_ref) {
+        	// Both ntlink and ntjoin_ref are true
+        		tuple("${val}.ntlink.ntjoin", reads1, reads2)
+    		} else if (params.ntlink_run) {
+        	// Only ntlink_run is true
+        		tuple("${val}.ntlink", reads1, reads2)
+    		} else if (params.ntjoin_ref) {
+        	// Only ntjoin_ref is true
+        		tuple("${val}.ntjoin", reads1, reads2)
+    		} else {
+        	// Default case if none of the above conditions are true
+        		tuple(val, reads1, reads2)
+    	}
+		}.set { assembly_sr_scafref }
+	
+	// Polish genome with short reads, merge input channel
+	assembly_sr_scafref.join(ASSEMBLY.assembly)	
+		.set { ch_sr_assembly }
+	//ch_sr_assembly.view()
+	POLISH_GENOME(ch_sr_assembly)
 
     emit:
         versions = CANU_ASSEMBLY.out.versions
