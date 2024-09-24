@@ -145,10 +145,10 @@ workflow ASSEMBLY_PIPELINE {
 		}.set { assembly_sr_scafref }
 	
 	// Polish genome with short reads, merge input channel
-	assembly_sr_scafref.join(ASSEMBLY.assembly)	
-		.set { ch_sr_assembly }
+	//assembly_sr_scafref.join(ASSEMBLY.assembly)	
+	//	.set { ch_sr_assembly }
 	//ch_sr_assembly.view()
-	POLISH_GENOME(ch_sr_assembly)
+	POLISH_GENOME(assembly_sr_scafref, ASSEMBLY.assembly)
 
     emit:
         versions = CANU_ASSEMBLY.out.versions

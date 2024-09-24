@@ -10,7 +10,6 @@ process POLYPOLISHFILT {
 
     input:
         tuple val(sample_id), path(reads_mapped1), path(reads_mapped2)
-	//tuple val(sample_id), path(genome)
 
     output:
         tuple val( sample_id ), path("${sample_id}_filt1.sam"), path("${sample_id}_filt2.sam"), emit: reads_filt
@@ -42,11 +41,10 @@ process POLYPOLISHPOLISH {
        'quay.io/biocontainers/polypolish:0.6.0--h4c94732_1'}"
 
     input:
-        tuple val(sample_id), path(reads_filt1), path(reads_filt2)
-	tuple val(sample_id), path(genome)
+        tuple val(sample_id), path(reads_filt1), path(reads_filt2), path(genome)
 
     output:
-        tuple path( sample_id ), path("${sample_id}_polished.fasta"), emit: genome_polished
+        tuple val( sample_id ), path("${sample_id}_polished.fasta"), emit: genome_polished
         path("versions.yml")                                        , emit: versions
 
     script:
@@ -54,7 +52,7 @@ process POLYPOLISHPOLISH {
     polypolish polish \
 	${genome} \
         ${reads_filt1} \
-        ${reads_filt2} > {sample_id}_polished.fasta
+        ${reads_filt2} > ${sample_id}_polished.fasta
 
     cat <<-VERSIONS > versions.yml
     "${task.process}":
