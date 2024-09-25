@@ -10,7 +10,7 @@ include { COVERAGE_CALCULATE as COV_PRIMARY }       from '../../../subworkflows/
 include { COVERAGE_CALCULATE as COV_SCAF }          from '../../../subworkflows/local/calculate_coverage/main'
 include { COVERAGE_CALCULATE as COV_SCAFREF }       from '../../../subworkflows/local/calculate_coverage/main'
 include { POLISH_GENOME }                           from '../../../subworkflows/local/run_polypolish/main'
-
+include { CLEANUP_GENOME }                          from '../../../subworkflows/local/cleanup_genomes_final/main'
 
 workflow ASSEMBLY_PIPELINE {
 
@@ -145,10 +145,10 @@ workflow ASSEMBLY_PIPELINE {
 		}.set { assembly_sr_scafref }
 	
 	// Polish genome with short reads, merge input channel
-	//assembly_sr_scafref.join(ASSEMBLY.assembly)	
-	//	.set { ch_sr_assembly }
-	//ch_sr_assembly.view()
-	POLISH_GENOME(assembly_sr_scafref, ASSEMBLY.assembly)
+	SR_POLISHED_GEN = POLISH_GENOME(assembly_sr_scafref, ASSEMBLY.assembly)
+
+	// Cleanup final genome
+	CLEANUP_GENOME(SR_POLISHED_GEN.polished_genome)
 
     emit:
         versions = CANU_ASSEMBLY.out.versions
