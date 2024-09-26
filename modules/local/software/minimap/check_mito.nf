@@ -1,9 +1,8 @@
 process MITO_ALIGN {
 
-    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/minimap2:2.28--he4a0461_0' :
-        'biocontainers/minimap2:2.28--he4a0461_0' }"
+                    'https://depot.galaxyproject.org/singularity/pomoxis%3A0.3.15--pyhdfd78af_0':
+                    'quay.io/biocontainers/pomoxis:0.2.2--py_0' }"
 
     label 'small_task'
     tag "Get mito genome ${sample_id}"
@@ -18,8 +17,8 @@ process MITO_ALIGN {
 
     script:
     """
-    minimap2 -x asm5 ${fasta_assembly} ${mitodb} |\
-	awk '{print \$6,\$6,"MT"}' | sed 's/ /\t/' | sort | uniq 1> ${sample_id}_MT.tab
+    minimap2 -ax asm5 ${mitodb} ${fasta_assembly} |\
+	samtools view -F 4 | awk '{print \$1,\$1,"MT"}' | sed 's/ /\t/' | sort | uniq 1> ${sample_id}_MT.tab
 
     cat <<-VERSIONS > versions.yml
     "${task.process}":
