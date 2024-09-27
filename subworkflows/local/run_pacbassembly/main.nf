@@ -157,7 +157,4 @@ workflow ASSEMBLY_PIPELINE {
         versions = CANU_ASSEMBLY.out.versions
         scaffolded = ASSEMBLY.assembly
 	cleanup_final_genome = CLEANED_GENOME.out_genome
-	// Uncomment the following if emitting these values
-        // cov_scaf_output = cov_scaf_output
-        // cov_scafref_output = cov_scafref_output
 }

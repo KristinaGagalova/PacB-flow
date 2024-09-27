@@ -1,3 +1,7 @@
+//-----------------------------------------
+// seqkit2: doi:10.1002/imt2.191.
+//-----------------------------------------
+
 process SEQKIT_LISTRENAME {
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?

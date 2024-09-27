@@ -1,10 +1,13 @@
+//-----------------------------------------
+// polypolish: doi:10.1099/mgen.0.001254.
+//-----------------------------------------
+
 process POLYPOLISHFILT {
 
     label 'medium_task'
     tag "Filter mapped reads."
 
-     conda (params.enable_conda ? "bioconda::polypolish=0.6.0" : null)
-     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/polypolish:0.6.0--hdbdd923_0'  :
         'quay.io/biocontainers/polypolish:0.6.0--h4c94732_1'}"
 
@@ -35,7 +38,6 @@ process POLYPOLISHPOLISH {
     label 'medium_task'
     tag "Polish genome with mapped reads."
 
-    conda (params.enable_conda ? "bioconda::polypolish=0.6.0" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
        'https://depot.galaxyproject.org/singularity/polypolish:0.6.0--hdbdd923_0'  :
        'quay.io/biocontainers/polypolish:0.6.0--h4c94732_1'}"

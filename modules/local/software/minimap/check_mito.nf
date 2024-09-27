@@ -1,3 +1,7 @@
+//-----------------------------------------
+// minimap2: doi:10.1093/bioinformatics/btab705
+//-----------------------------------------
+
 process MITO_ALIGN {
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -25,5 +29,4 @@ process MITO_ALIGN {
 	 minimap2: \$(minimap2 --version 2>&1)
     VERSIONS    
     """
-
 }

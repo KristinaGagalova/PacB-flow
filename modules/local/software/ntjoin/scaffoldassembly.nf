@@ -1,10 +1,13 @@
+//-----------------------------------------
+// ntJoin: https://doi.org/10.1093/bioinformatics/btaa253
+//-----------------------------------------
+
 process NTJOIN_SCAFFOLD {
 
     label 'medium_task'
     tag "Scaffold ${sample_id} with reference."
 
-     conda (params.enable_conda ? "bioconda::ntjoin=1.1.3" : null)
-     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/ntjoin:1.1.3--py39hd65a603_0'  :
         'quay.io/biocontainers/ntjoin:1.1.3--py39hd65a603_0'}"
 
@@ -44,8 +47,8 @@ process NTJOIN_SCAFFOLD {
     mv ntjoin* ${sample_id}/
 
     #cleanup ref genome files - these must be left for other samples
-    #rm ${args_ref}.k${args_k}.w${args_w}.tsv
-    #rm ${args_ref}.fai
+    rm ${args_ref}.k${args_k}.w${args_w}.tsv
+    rm ${args_ref}.fai
 
     cat <<-VERSIONS > versions.yml
     "${task.process}":

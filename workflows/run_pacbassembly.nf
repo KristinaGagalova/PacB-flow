@@ -22,10 +22,16 @@ workflow PBFLOW_WORKFLOW {
                              tuple(sample, sr1_reads, sr2_reads)}
                         .set { sample_sr_ch }
 
-	//sample_run_ch.view()
 	ASSEMBLY_PIPELINE(
 		sample_lr_ch,
 		sample_sr_ch
 	)
 
+        //
+        // Collate and save software versions
+        //
+    	softwareVersionsToYAML(ch_versions)
+        	.collectFile(storeDir: "${params.outdir}/pipeline_info", name: 'nf_core_pipeline_software_mqc_versions.yml', sort: true, newLine: true)
+        	.set { ch_collated_versions }
 }
+	

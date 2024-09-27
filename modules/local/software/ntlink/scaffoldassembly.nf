@@ -1,16 +1,18 @@
+//-----------------------------------------
+// ntLink: doi.org/10.1186/s12859-021-04451-7
+//-----------------------------------------
+
 process NTLINK_SCAFFOLD {
 
     label 'medium_task'
     tag "Scaffold ${sample_id} with long reads."
 
-    conda (params.enable_conda ? "bioconda::ntlink=1.3.10" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
        'https://depot.galaxyproject.org/singularity/ntlink:1.3.9--py39hd65a603_2'  :
        'quay.io/biocontainers/ntlink:1.3.10--py312hb36dd0b_2'}"
 
     input:
         tuple val(sample_id), path(reads), path(assembly)
-	//tuple val(sample_id), path(reads)
 
     output:
         tuple val("${sample_id}.ntlink"), path("${sample_id}/${sample_id}.ntlink.scaffolds.fa") , emit: assembly

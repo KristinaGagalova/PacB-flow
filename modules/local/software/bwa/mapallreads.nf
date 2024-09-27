@@ -1,9 +1,12 @@
+//-----------------------------------------
+// bwa: https://doi.org/10.1093/bioinformatics/btp324
+//-----------------------------------------
+
 process BWAMEM_MAPALL {
 
     label 'medium_task'
     tag "Map reads ${sample_id} unpaired."
 
-    conda (params.enable_conda ? "bioconda::bwa=0.7.18" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
     	'https://depot.galaxyproject.org/singularity/bwa:0.7.18--he4a0461_0'  :
         'quay.io/biocontainers/bwa:0.7.18--he4a0461_0'}"

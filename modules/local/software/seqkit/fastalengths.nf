@@ -1,6 +1,9 @@
+//-----------------------------------------
+// seqkit2: doi:10.1002/imt2.191.
+//-----------------------------------------
+
 process SEQKIT_LENGTHS {
 
-    conda (params.enable_conda ? "bioconda::bedtools=2.8.1" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/seqkit:2.8.1--h9ee0642_0  '  :
         'quay.io/biocontainers/seqkit:2.8.1--h9ee0642_0'}"
@@ -17,6 +20,11 @@ process SEQKIT_LENGTHS {
     script:
     """
     seqkit fx2tab --length --only-id ${fasta_assembly} --name --out-file ${sample_id}.genome
+    
+    cat <<-VERSIONS > versions.yml
+    "${task.process}":
+	seqkit: \$(seqkit version | cut -d' ' -f2)
+    VERSIONS
     """
 }
     
