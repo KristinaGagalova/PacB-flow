@@ -15,12 +15,9 @@ process ABYSS_FAC {
 	path("versions.yml") , emit: versions
 
     script:
-    def command = params.ng50 ? 
-        "abyss-fac ${assemblies} -G${params.abyss_gensize} > all_stats.tsv" : 
-        "abyss-fac ${assemblies} > all_stats.tsv"
-
+    def command = params.ng50 ? "-G${params.abyss_gensize}" : " "
     """
-    ${command}
+    abyss-fac ${assemblies} ${command} > all_stats.tsv
 
     cat <<-VERSIONS > versions.yml
     "${task.process}":
