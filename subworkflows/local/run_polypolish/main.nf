@@ -56,6 +56,6 @@ workflow POLISH_GENOME {
 
     emit:
 	filt_reads  = FILT_READS.reads_filt
-        polished_genome = polished_genome.genome_polished
+        assembly = polished_genome.genome_polished
 }
 

@@ -12,6 +12,14 @@ include { COVERAGE_CALCULATE as COV_SCAFREF }       from '../../../subworkflows/
 include { POLISH_GENOME }                           from '../../../subworkflows/local/run_polypolish/main'
 include { CLEANUP_GENOME }                          from '../../../subworkflows/local/cleanup_genomes_final/main'
 
+
+// Define functions
+def collectAssemblies(ASSEMBLY, allAssembliesChannel) {
+	return ASSEMBLY.map { it -> it[1] }
+	.mix(allAssembliesChannel)
+	.collect()
+	}
+
 workflow ASSEMBLY_PIPELINE {
 
     take:
@@ -19,6 +27,7 @@ workflow ASSEMBLY_PIPELINE {
         assembly_sr // tuple [sample, sr1_reads, sr2_reads]
 
     main:
+		
         //
         allAssembliesChannel = Channel.empty()
 
@@ -28,11 +37,10 @@ workflow ASSEMBLY_PIPELINE {
                    .set { ch_readslr_assembly }
         COV_PRIMARY(ch_readslr_assembly)
         ASSEMBLY = CANU_ASSEMBLY_OUT
-        ASSEMBLY.assembly
-                .map { it -> it[1] }
-                .mix(allAssembliesChannel)
-                .collect()
-                .set { all_assemblies }
+	
+	// collect assemblies
+	collectAssemblies(ASSEMBLY.assembly, allAssembliesChannel)
+        	.set { all_assemblies }
 
         // Default suffix
         nam_suffix = ''
@@ -58,11 +66,8 @@ workflow ASSEMBLY_PIPELINE {
             def cov_scaf_output = COV_SCAF(ch_readslr_assembly_scaf)
 
             // Ensure the assembly after ntLink is mixed into all assemblies
-            ASSEMBLY.assembly
-                    .map { it -> it[1] }
-                    .mix(all_assemblies)
-                    .collect()
-                    .set { all_assemblies }
+	    collectAssemblies(ASSEMBLY.assembly, allAssembliesChannel)
+                .set { all_assemblies }
 
         }
 
@@ -96,11 +101,8 @@ workflow ASSEMBLY_PIPELINE {
     		def cov_scafref_output = COV_SCAFREF(ch_readslr_assembly_scaf_ref)
 
 		// Ensure the assembly after ntJoin is mixed into all assemblies
-            	ASSEMBLY.assembly
-                    .map { it -> it[1] }
-                    .mix(allAssembliesChannel)
-                    .collect()
-                    .set { all_assemblies }
+		collectAssemblies(ASSEMBLY.assembly, allAssembliesChannel)
+                	.set { all_assemblies }
 
 	} else if (params.ntjoin_ref) {
     		// If only ntJoin_ref is provided, run NTJOIN directly
@@ -118,15 +120,9 @@ workflow ASSEMBLY_PIPELINE {
     		def cov_scafref_output = COV_SCAFREF(ch_readslr_assembly_scaf_refOnly)
 		
 		// Ensure the assembly after ntJoin is mixed into all assemblies
-            	ASSEMBLY.assembly
-                    .map { it -> it[1] }
-                    .mix(allAssembliesChannel)
-                    .collect()
-                    .set { all_assemblies }
+		collectAssemblies(ASSEMBLY.assembly, allAssembliesChannel)
+                	.set { all_assemblies }
 	}
-	
-        // Run stats on final output
-        ABYSS_FAC(all_assemblies)
 	
 	assembly_sr.map { val, reads1, reads2 ->
     		if (params.ntlink_run && params.ntjoin_ref) {
@@ -145,15 +141,23 @@ workflow ASSEMBLY_PIPELINE {
 		}.set { assembly_sr_scafref }
 	
 	// Polish genome with short reads, merge input channel
-	SR_POLISHED_GEN = POLISH_GENOME(assembly_sr_scafref, ASSEMBLY.assembly)
+	ASSEMBLY = POLISH_GENOME(assembly_sr_scafref, ASSEMBLY.assembly)
+
+	collectAssemblies(ASSEMBLY.assembly, allAssembliesChannel)
+                .set { all_assemblies }
+
+	// Run stats on final output
+        ABYSS_FAC(all_assemblies)
 
 	// Cleanup final genome
-	CLEANUP_GENOME(SR_POLISHED_GEN.polished_genome)
+	CLEANED_GENOME = CLEANUP_GENOME(ASSEMBLY.assembly)
+
 
     emit:
         versions = CANU_ASSEMBLY.out.versions
         scaffolded = ASSEMBLY.assembly
-        // Uncomment the following if emitting these values
+	cleanup_final_genome = CLEANED_GENOME.out_genome
+	// Uncomment the following if emitting these values
         // cov_scaf_output = cov_scaf_output
         // cov_scafref_output = cov_scafref_output
 }
