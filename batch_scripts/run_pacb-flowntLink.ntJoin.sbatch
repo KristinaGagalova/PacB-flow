@@ -20,7 +20,7 @@ nextflow run ./main.nf -resume \
 	-profile pawsey_setonix,singularity \
 	--manifest samples.tsv \
 	--ntlink_run true \
-	--ntjoin_ref '/scratch/y95/kgagalova/projectPaoTheen/reads/canu2/GCA_900231935.2_ERZ478497_genomic.fna' \
+	--ntjoin_ref '/scratch/y95/kgagalova/projectPaoTheen/finalRuns/genomes_scaf/GCA_900231935.2_ERZ478497_genomic.fna' \
         --ntjoin_ref_weights '2' \
         --ntjoin_w 500 \
         --ntjoin_k 24 \

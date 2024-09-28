@@ -66,7 +66,7 @@ workflow ASSEMBLY_PIPELINE {
             def cov_scaf_output = COV_SCAF(ch_readslr_assembly_scaf)
 
             // Ensure the assembly after ntLink is mixed into all assemblies
-	    collectAssemblies(ASSEMBLY.assembly, allAssembliesChannel)
+	    collectAssemblies(ASSEMBLY.assembly, all_assemblies)
                 .set { all_assemblies }
 
         }
@@ -101,7 +101,7 @@ workflow ASSEMBLY_PIPELINE {
     		def cov_scafref_output = COV_SCAFREF(ch_readslr_assembly_scaf_ref)
 
 		// Ensure the assembly after ntJoin is mixed into all assemblies
-		collectAssemblies(ASSEMBLY.assembly, allAssembliesChannel)
+		collectAssemblies(ASSEMBLY.assembly, all_assemblies)
                 	.set { all_assemblies }
 
 	} else if (params.ntjoin_ref) {
@@ -120,7 +120,7 @@ workflow ASSEMBLY_PIPELINE {
     		def cov_scafref_output = COV_SCAFREF(ch_readslr_assembly_scaf_refOnly)
 		
 		// Ensure the assembly after ntJoin is mixed into all assemblies
-		collectAssemblies(ASSEMBLY.assembly, allAssembliesChannel)
+		collectAssemblies(ASSEMBLY.assembly, all_assemblies)
                 	.set { all_assemblies }
 	}
 	
@@ -143,7 +143,7 @@ workflow ASSEMBLY_PIPELINE {
 	// Polish genome with short reads, merge input channel
 	ASSEMBLY = POLISH_GENOME(assembly_sr_scafref, ASSEMBLY.assembly)
 
-	collectAssemblies(ASSEMBLY.assembly, allAssembliesChannel)
+	collectAssemblies(ASSEMBLY.assembly, all_assemblies)
                 .set { all_assemblies }
 
 	// Run stats on final output
