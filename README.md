@@ -5,7 +5,7 @@ This workflow is designed to assembly genomes with long-read and polish with sho
 The project is developed under the Analytics for the Australian Grains Industry (AAGI) and is carried out for the Centre for Crop and Disease Management (CCDM). 
 The workflow is part of broader efforts to enhance genomic research in crop disease management and improve the understanding of pathogen resistance in plants.
 
-![nf-pipeline](img/Nf-pacbflow.png)
+![nf-pipeline](img/nextflow-pipeline.png)
 *PacB-flow pipeline.*
 
 If you encounter any bugs or have suggestions for new features, please open an issue or feel free to contact the author directly for assistance.
