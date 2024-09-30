@@ -3,14 +3,12 @@ process PBMM_MAPLONG {
     label 'large_task'
     tag "Mapping long reads ${sample_id}"
 
-     conda (params.enable_conda ? "bioconda::pbmm=1.14" : null)
-     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/pbmm2:1.14.99--h9ee0642_0'  :
 	'quay.io/biocontainers/pbmm2:1.13.1_build3'}"
 
     input:
         tuple val(sample_id), path(reads), path(assembly)
-	// tuple val(assembly_id), path(assembly)
     
     output:
         tuple val(sample_id), path("${sample_id}.lr.sort.bam")    , emit: mapped_lr

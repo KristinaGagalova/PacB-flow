@@ -1,10 +1,13 @@
+//-----------------------------------------
+// CANU assembler: doi:10.1101/gr.215087.116
+//-----------------------------------------
+
 process CANU_ASSEMBLY {
 
     label 'large_assemblyTask'
     tag "Assemble long reads for ${sample_id}"
 
-     conda (params.enable_conda ? "bioconda::canu=2.2" : null)
-     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/canu:2.2--ha47f30e_0'  :
 	'quay.io/biocontainers/canu:2.2--ha47f30e_0'}"
 

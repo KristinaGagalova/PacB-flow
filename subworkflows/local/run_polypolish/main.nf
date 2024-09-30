@@ -11,54 +11,51 @@ include { POLYPOLISHPOLISH }                     from '../../../modules/local/so
 workflow POLISH_GENOME {
 
     take:
-        sample_pair_genome        // tuple [ sample, reads_pair1, reads_pair2, genome ]
+        sample_pair_genome        // tuple [ sample, reads_pair1, reads_pair2 ]
+	genome	                  // tuple [ sample, genome ]
 
     main:
-        // Separate channels for reads1, reads2, and genome
-        sample_pair_genome.map { sample, reads1, reads2, genome -> tuple(sample, reads1) }
-                        .set { reads_pair1 }
-
-        sample_pair_genome.map { sample, reads1, reads2, genome -> tuple(sample, reads2) }
-                        .set { reads_pair2 }
-
-        // Index genome for each sample using the correct genome
-	sample_pair_genome.map { sample, reads1, reads2, genome -> tuple(sample, genome) }
-			.set { genome_channel }
-
-	// Step 2: Pass the genome to the BWA_INDEX process
-	indexed_genome = BWA_INDEX(genome_channel)
+	// Pass the genome to the BWA_INDEX process
+	indexed_genome = BWA_INDEX(genome)
 	
-	
-        // Map reads individually using the indexed genome output as input for the index
+        // Create channels for each R1 and R2 plus genome
+	sample_pair_genome.join(indexed_genome.index)
+		.map { sample, reads1, reads2, genome -> tuple(sample, reads1, genome)}
+		.set { reads_gen_r1 }
+
+	sample_pair_genome.join(indexed_genome.index)
+                .map { sample, reads1, reads2, genome -> tuple(sample, reads2, genome)}
+                .set { reads_gen_r2 }	
+
+	// Map reads individually using the indexed genome output as input for the index
         reads_R1 = BWAMEM_R1(
-		reads_pair1,
-        	"R1",
-        	indexed_genome.index)
+		reads_gen_r1,
+        	"R1"
+		)
 
          reads_R2 = BWAMEM_R2(
-		reads_pair2,
-                "R2",
-                indexed_genome.index
+		reads_gen_r2,
+                "R2"
             )
 
-        // Pair reads together
+        // Pair reads together after mapping
         reads_R1.reads_mapped.join(reads_R2.reads_mapped)
                 .set { ch_readsR1_readsR2 }
-	//ch_readsR1_readsR2.view()
+
         // Polypolish filtering step
         FILT_READS = POLYPOLISHFILT(ch_readsR1_readsR2)
 
+	// Pair filtered reads and genome
+	FILT_READS.reads_filt.join(genome)
+		.set { ch_readsR1_readsR2_genome }
+
         // Polypolish polishing genome step
         polished_genome = POLYPOLISHPOLISH(
-                FILT_READS.reads_filt,
-                sample_pair_genome.map { 
-			sample, reads1, reads2, genome -> tuple(sample, genome) 
-		} // pass the original genome
-        )
+                ch_readsR1_readsR2_genome
+        	)
 
     emit:
-	//index_gen = indexed_genome.index
 	filt_reads  = FILT_READS.reads_filt
-        polished_genome = polished_genome.genome_polished
+        assembly = polished_genome.genome_polished
 }
 

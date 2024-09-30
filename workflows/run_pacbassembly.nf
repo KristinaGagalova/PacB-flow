@@ -22,10 +22,10 @@ workflow PBFLOW_WORKFLOW {
                              tuple(sample, sr1_reads, sr2_reads)}
                         .set { sample_sr_ch }
 
-	//sample_run_ch.view()
 	ASSEMBLY_PIPELINE(
 		sample_lr_ch,
 		sample_sr_ch
 	)
 
 }
+	
